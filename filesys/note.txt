@@ -1,0 +1,30 @@
+空闲链表结构
+struct {
+    unsigned long offset;
+    unsigned long size;
+    struct *next;
+};
+
+/ 目录读取
+
+int count //root目录下面文件个数
+目录结构
+struct {
+    char name[128];
+    unsigned long inode;
+}
+
+
+文件信息头（inode处读取结构)
+struct{
+    char type; // d n
+    time_t change_time;
+    unsigned short rwx;
+    unsigned long offset_this; // 本block的位置
+    unsigned long size; //本block的大小
+    unsigned long offset_next; //下一块block的位置， 0表示没有下一块
+}
+
+
+free block 
+

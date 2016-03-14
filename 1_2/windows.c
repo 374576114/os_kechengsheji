@@ -93,8 +93,12 @@ int addw(int *argc, char **argv[], int t){
 	gtk_init(argc, argv);
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+	//gtk_window_set_position(GTK_WINDOW(window),GTK_WIN_POS_CENTER_ON_PARENT );
 	gtk_window_set_default_size(GTK_WINDOW(window), 200, 180);
 	gtk_window_set_title(GTK_WINDOW(window), "1到100累加");
+	//gtk_window_reposition(GTK_WINDOW(window), 0, 0);
+	//gtk_widget_set_uposition(GTK_WINDOW(window), 0, 0);
+	gtk_window_move((GtkWindow *)window, 300,100);
 
 	frame = gtk_fixed_new();
 	gtk_container_add(GTK_CONTAINER(window), frame);
@@ -122,8 +126,10 @@ int cpuw(int *argc, char **argv[], int t){
 	gtk_init(argc, argv);
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+	//gtk_window_set_position(GTK_WINDOW(window),GTK_WIN_POS_CENTER_ON_PARENT );
 	gtk_window_set_default_size(GTK_WINDOW(window), 200, 180);
 	gtk_window_set_title(GTK_WINDOW(window), "cpu 利用率");
+	gtk_window_move((GtkWindow*)window, 500,100);
 
 	frame = gtk_fixed_new();
 	gtk_container_add(GTK_CONTAINER(window), frame);
@@ -150,8 +156,10 @@ int timew(int *argc, char **argv[], int t){
 	gtk_init(argc, argv);
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+	//gtk_window_set_position(GTK_WINDOW(window),NONE);
 	gtk_window_set_default_size(GTK_WINDOW(window), 200, 180);
 	gtk_window_set_title(GTK_WINDOW(window), "时间");
+	gtk_window_move((GtkWindow*)window, 100,100);
 
 	frame = gtk_fixed_new();
 	gtk_container_add(GTK_CONTAINER(window), frame);
@@ -194,4 +202,4 @@ int main(int argc , char *argv[]){
 			return 0;
 		}
 	}
-
+}

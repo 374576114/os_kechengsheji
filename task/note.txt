@@ -1,0 +1,5 @@
+主机名 : /proc/sys/kernel/hostname
+时间： /proc/uptime
+信息： /proc/version
+cpu： /proc/cpuinfo
+
