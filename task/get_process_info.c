@@ -1,21 +1,5 @@
 #include "task.h"
-
-typedef struct p_info{
-	int id;
-	int flag;
-	char name[100];
-	char mem[50];
-	int user;
-	long cpu_total1;
-	long cpu_total2;
-	long process1;
-	long process2;
-	float cpu;
-	int priority;
-	int nice;
-	struct p_info *p;
-	struct p_info *next;
-}p_info_t;
+int printall(p_info_t *p);
 /*
  * 传入ID号dir
  */
@@ -185,13 +169,13 @@ p_info_t * sort_by_cpu(p_info_t *phead)
 		p = p->next;
 	}
 
-	pmax_head->process1 = 0;
+	pmax_head->cpu_total1 = 0;
 	p1 = pmax_head;
 	p2 = p1;
 
 	while(1){
 		p = phead;
-		while(p!=NULL && p->process1 == 0)
+		while(p!=NULL && p->cpu_total1 == 0)
 		  p = p->next;
 		if(!p)
 		  break;
@@ -199,13 +183,13 @@ p_info_t * sort_by_cpu(p_info_t *phead)
 		p1 = p;
 
 		while(p){
-			if(p->process1!=0 && p->cpu > cpu){
+			if(p->cpu_total1!=0 && p->cpu > cpu){
 				cpu = p->cpu;
 				p1 = p;
 			}
 			p = p->next;
 		}
-		p1->process1 = 0;
+		p1->cpu_total1 = 0;
 		p2->p = p1;
 		p2 = p1;
 	}
@@ -230,13 +214,13 @@ p_info_t * sort_by_mem(p_info_t *phead)
 		p = p->next;
 	}
 
-	pmax_head->process1 = 0;
+	pmax_head->cpu_total1 = 0;
 	p1 = pmax_head;
 	p2 = p1;
 
 	while(1){
 		p = phead;
-		while(p!=NULL && p->process1 == 0)
+		while(p!=NULL && p->cpu_total1 == 0)
 		  p = p->next;
 		if(!p)
 		  break;
@@ -244,59 +228,22 @@ p_info_t * sort_by_mem(p_info_t *phead)
 		p1 = p;
 
 		while(p){
-			if(p->process1!=0 && atof(p->mem) > mem){
+			if(p->cpu_total1!=0 && atof(p->mem) > mem){
 				mem = atof(p->mem);
 				p1 = p;
 			}
 			p = p->next;
 		}
-		p1->process1 = 0;
+		p1->cpu_total1 = 0;
 		p2->p = p1;
 		p2 = p1;
 	}
 	p1->p = NULL;
 	return pmax_head;
 }
-
-void print_cpu_sort(p_info_t *head)
-{
-	p_info_t *p = head;
-	while(p){
-		printf("%s %d %s %lu\n", p->name, p->id, p->mem, p->process1);
-		p = p->p;
-	}
-}
-int printall(p_info_t *p)
-{
-	struct p_info s;
-	p_info_t * p1 = NULL;
-	//p1 = sort_by_cpu(p);
-	//p1 = sort_by_mem(p);
-	p1 = sort_by_name(p);
-	//while(p->next){
-		//if(p->cpu > 1.0){
-		//s = *p;
-		s = *p1;
-		printf("flag :%d", s.flag);
-		printf("name: %s\n", s.name);
-		printf("%d\n", s.id);
-		printf("use:%ld\n", s.process2 - s.process1);
-		printf("all:%ld\n", s.cpu_total2 - s.cpu_total1);
-		printf("%d\n", s.user);
-		printf("%s\n", s.mem);
-		printf("%d\n", s.priority);
-		printf("%d\n", s.nice);
-		printf("cpu: %.2f\n", s.cpu);
-		getchar();
-		print_cpu_sort(p1);
-		//print_mem_sort(p1);
-		//}
-		//p = p->next;
-	//}
-	return 0;
-}
-
-
+/*
+ * 完成对链表的添加
+ */
 int complete_link_list(p_info_t *phead, const char *dir, int id, int n)
 {
 	p_info_t *p = phead;
@@ -352,6 +299,9 @@ int complete_link_list(p_info_t *phead, const char *dir, int id, int n)
 		return 0;
 	}
 }
+/*
+ * 将链表标志位清零
+ */
 void reset_all_list(p_info_t *head)
 {
 	p_info_t *p = head;
@@ -361,27 +311,30 @@ void reset_all_list(p_info_t *head)
 		p = p->next;
 	}
 }
-
-//int process_info_main_f()
-int main()
+/*
+ * 控制完成对相应信息的读取
+ */
+int process_info_main_f(p_info_t **head, int n)
 {
 	DIR *dp ;
 	struct dirent* entry;
 	struct stat statbuf;
 	const char *dir = "/proc/";
-	p_info_t *head ;
+	//p_info_t *head ;
 	int id = 0;
 
 	/*初始化头节点*/
-	head = (p_info_t *)malloc(sizeof(struct p_info));
-	if(head == NULL){
-		printf("memory error\n");
-		exit(1);
+	if((*head) == NULL){/*如果是第一次则完成初始化*/
+		*head = (p_info_t *)malloc(sizeof(struct p_info));
+		if(head == NULL){
+			printf("memory error\n");
+			exit(1);
+		}
+		(*head)->flag = 0;
+		//head->pre = NULL;
+		(*head)->next = NULL;
+		(*head)->id = -1;
 	}
-	head->flag = 0;
-	//head->pre = NULL;
-	head->next = NULL;
-	head->id = -1;
 
 	if( chdir(dir) == -1){
 		printf("cannot change the dir\n");
@@ -397,17 +350,14 @@ int main()
 		lstat(entry->d_name, &statbuf);
 		if(S_ISDIR(statbuf.st_mode)){
 			if( (id = atoi(entry->d_name)) != 0){
-				/*已经进入某个进程，可以进入该文件夹*/
-				/*opendir(entry->d_name) 进入目录*/
-				/*chdir() 改变当前目录*/
-				/*当结束n时，将当前目录转会 ..*/
 				//printf("ID :%d\n", id);
-				complete_link_list(head, entry->d_name, id, 1);
+				complete_link_list(*head, entry->d_name, id, n);
 			}
 		}
 	}
-	sleep(1);
+	//sleep(1);
 	/*第二遍读*/
+	/*
 	if( (dp = opendir(dir)) == NULL){
 		printf("cannot open the dir %s\n", dir);
 		exit(1);
@@ -416,17 +366,112 @@ int main()
 		lstat(entry->d_name, &statbuf);
 		if(S_ISDIR(statbuf.st_mode)){
 			if( (id = atoi(entry->d_name)) != 0){
-				/*已经进入某个进程，可以进入该文件夹*/
-				/*opendir(entry->d_name) 进入目录*/
-				/*chdir() 改变当前目录*/
-				/*当结束n时，将当前目录转会 ..*/
-				complete_link_list(head, entry->d_name,id, 2);
+				complete_link_list(*head, entry->d_name,id, 2);
 				//printf("ID :%d\n", id);
 			}
 		}
-	}
-	printall(head);
+	}*/
+	//printall(*head);
 	//sort_by_cpu(head);
+	return 0;
+}
+/*
+ * 完成用户组的提取
+ */
+int get_user_f(p_info_t *head, u_name_to_id_t* head1)
+{
+	p_info_t *p = head;
+
+	while(p){
+		user_find_f(p->user, p->c_user, head1);
+		p = p->next;
+	}
+	return 0;
+}
+/*
+ * 完成将结构体种的数据转换成字符串
+ */
+int struct_data_to_string(p_info_t *head)
+{
+	p_info_t *p = head;
+	while(p){
+		snprintf(p->c_id, 6, "%d", p->id);
+		snprintf(p->c_cpu, 7, "%.2f", p->cpu);
+		snprintf(p->c_nice, 4, "%d", p->nice);
+		snprintf(p->c_priority, 5, "%d", p->priority);
+		
+		(p->list)[0] = p->name;
+		(p->list)[1] = p->c_user;
+		(p->list)[2] = p->c_cpu;
+		(p->list)[3] = p->c_id;
+		(p->list)[4] = p->mem;
+		(p->list)[5] = p->c_priority;
+		(p->list)[6] = p->c_nice;
+		
+		p = p->next;
+	}
 
 	return 0;
 }
+void print_cpu_sort(p_info_t *head)
+{
+	p_info_t *p = head;
+	while(p){
+		//printf("%s %d %s %lu %s\n", p->name, p->id, p->mem, p->process1, p->list[1]);
+		printf("%s %s %s %s %s %s %s \n", p->list[0], p->list[1], p->list[2], p->list[3], p->list[4], p->list[5], p->list[6]);
+		p = p->p;
+	}
+}
+int printall(p_info_t *p)
+{
+	struct p_info s;
+	p_info_t * p1 = NULL;
+	//p1 = sort_by_cpu(p);
+	p1 = sort_by_mem(p);
+	//p1 = sort_by_name(p);
+	
+	s = *p1;
+	printf("flag :%d", s.flag);
+	printf("name: %s\n", s.name);
+	printf("%d\n", s.id);
+	printf("use:%ld\n", s.process2 - s.process1);
+	printf("all:%ld\n", s.cpu_total2 - s.cpu_total1);
+	printf("%d\n", s.user);
+	printf("%s\n", s.mem);
+	printf("%d\n", s.priority);
+	printf("%d\n", s.nice);
+	printf("cpu: %.2f\n", s.cpu);
+	//getchar();
+
+	print_cpu_sort(p1);
+
+	return 0;
+}
+/*
+int main()
+{
+	p_info_t *head = NULL;
+	u_name_to_id_t *head1 = NULL;
+
+	user_find_list(&head1);
+	process_info_main_f(&head, 1);
+	sleep(1);
+	process_info_main_f(&head, 2);
+	get_user_f(head, head1);
+	struct_data_to_string(head);
+	printall(head);
+	
+	while(1){
+		process_info_main_f(&head, 1);
+		sleep(1);
+		process_info_main_f(&head, 2);
+		get_user_f(head, head1);
+		struct_data_to_string(head);
+		printall(head);
+		getchar();
+	}
+	
+	return 0;
+}*/
+
+	

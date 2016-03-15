@@ -17,11 +17,11 @@ int version_f(char *ver)
 	return 0;
 }
 
-int main(){
+/*int main(){
 	char ver[50];
 	version_f(ver);
 	printf("%s\n", ver);
 	return 0;
-}
+}*/
 	
 

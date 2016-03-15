@@ -40,17 +40,17 @@ int start_time(char *run, char *start)
 	  sprintf(c_s, "%ld", t_run);
 
 	sprintf(run, "%s:%s:%s", c_h, c_m, c_s);
-
 	strcpy(start, ctime(&t_start));
 
 	fclose(fp);
 	return 0;
 }
 
+/*
 int main(){
 	char s1[20], s2[50];
 	start_time(s1, s2);
 	printf("Start Time: %s", s2+11);
 	printf("Running Time: %s\n", s1);
 	return 0;
-}
+}*/

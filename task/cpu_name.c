@@ -21,6 +21,7 @@ int read_cpu_info(char *name)
 	sprintf(name, "%s", buf+13); 
 	return 0;
 }
+/*
 
 int main()
 {
@@ -28,7 +29,7 @@ int main()
 	read_cpu_info(name);
 	printf("%s", name);
 	return 0;
-}
+}*/
 
 
 

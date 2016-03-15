@@ -1,6 +1,6 @@
 #include "task.h"
 
-float mem_f()
+float mem_f(int *all)
 {
 	FILE *fp = NULL;
 	const char *file = "/proc/meminfo";
@@ -15,12 +15,13 @@ float mem_f()
 	fscanf(fp, "%*s %d %*s %*s %d %*s %*s %d %*s %*s %d", &total, &free, &buffers, &cached);
 	
 	mem = 1.0 * 100 *(total -free - buffers - cached) / total;
+	*all = total;
 
 	fclose(fp);
 	return mem;
 }
-
+/*
 int main(){
 	printf("%.3f \n", mem_f());
 	return 0;
-}
+}*/

@@ -14,6 +14,7 @@ int hostname(char *name)
 	fscanf(fp, "%s", name);
 	return 0;
 }
+/*
 
 int main()
 {
@@ -22,4 +23,4 @@ int main()
 	printf("%s\n", name);
 	return 0;
 }
-
+*/
